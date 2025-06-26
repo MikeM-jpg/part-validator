@@ -39,3 +39,31 @@ fetch(url)
     });
 
     document.getEleme
+// Initialize QR/Barcode scanner
+function startScanner() {
+  const scanner = new Html5Qrcode("reader");
+
+  scanner.start(
+    { facingMode: "environment" }, // rear camera
+    {
+      fps: 10,
+      qrbox: 250,
+    },
+    (decodedText, decodedResult) => {
+      document.getElementById('manualInput').value = decodedText;
+      checkPart();
+      scanner.stop().then(() => {
+        document.getElementById('reader').innerHTML = ""; // remove scanner box
+      });
+    },
+    (errorMessage) => {
+      // silent scan errors (ignore for now)
+    }
+  ).catch(err => {
+    console.error("Scanner failed to start", err);
+  });
+}
+
+window.onload = () => {
+  startScanner();
+};
