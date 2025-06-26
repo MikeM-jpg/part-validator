@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Part Validator</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+</head>
+<body>
+  <h1>📦 Part Validator</h1>
+  <p>Last Updated: <span id="last-updated">Loading...</span></p>
+
+  <div id="reader" style="width: 100%; max-width: 400px; margin: auto;">
+    <video id="preview" style="width: 100%; border: 1px solid #ccc;"></video>
+    <p>Detected: <span id="live-code">Waiting...</span></p>
+    <button id="confirmBtn" onclick="confirmScan()">Scan</button>
+  </div>
+
+  <button onclick="restartScanner()">Rescan</button>
+
+  <p>or manually enter a part number:</p>
+  <input type="text" id="manualInput" placeholder="Enter part number" />
+  <button onclick="checkPart()">Check</button>
+
+  <div id="result"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
