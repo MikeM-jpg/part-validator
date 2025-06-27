@@ -55,6 +55,7 @@ function restart() {
   start();
 }
 
+let lastBox = null;
 function start() {
   document.getElementById('startBtn').style.display='none';
   document.getElementById('interactive').style.display='block';
@@ -68,23 +69,25 @@ function start() {
     if(e){console.error(e);return;} Quagga.start();
   });
 
-  Quagga.onProcessed(res=>{
-    const ctx=Quagga.canvas.ctx.overlay, cv=Quagga.canvas.dom.overlay;
-    ctx.clearRect(0,0,cv.width,cv.height);
-    if(res && res.box){
+  
+  Quagga.onProcessed(result => {
+    const ctx = Quagga.canvas.ctx.overlay, canvas = Quagga.canvas.dom.overlay;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (result && result.box) {
+      lastBox = result.box;
+    }
+    if (lastBox) {
       ctx.beginPath();
-      ctx.moveTo(res.box[0][0],res.box[0][1]);
-      res.box.slice(1).forEach(p=>ctx.lineTo(p[0],p[1]));
+      ctx.moveTo(lastBox[0][0], lastBox[0][1]);
+      for (let i = 1; i < lastBox.length; i++) {
+        ctx.lineTo(lastBox[i][0], lastBox[i][1]);
+      }
       ctx.closePath();
-      ctx.lineWidth=4; ctx.strokeStyle='rgba(0,255,0,0.4)'; ctx.stroke();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = 'rgba(0,255,0,0.4)';
+      ctx.stroke();
     }
   });
 
-  Quagga.onDetected(res=>{
-    if(stopped) return;
-    const code=res.codeResult.code.replace(/[\s-]/g,'').toUpperCase();
-    document.getElementById('live-code').textContent=code;
-    if(partMap[code]) confirm(code);
-  });
 }
 const startScanner=start, restartScanner=restart;
