@@ -4,7 +4,6 @@ const sheetName = 'Sheet1';
 const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
 
 let partMap = {};
-let lastUpdated = '';
 let currentDetectedCode = '';
 let scannerInitialized = false;
 
