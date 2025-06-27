@@ -13,6 +13,7 @@ input {
 button {
   font-size: 1em;
   padding: 10px 20px;
+  margin: 5px;
 }
 #result {
   margin-top: 20px;
