@@ -1,1 +1,70 @@
-/* placeholder for style.css */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f5f7fa;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
+h1 {
+  margin-bottom: 5px;
+}
+.updated {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 20px;
+}
+button {
+  padding: 10px 20px;
+  font-size: 1em;
+  margin: 10px 5px;
+  border: none;
+  border-radius: 8px;
+  background-color: #2e7d32;
+  color: white;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #1b5e20;
+}
+.reader {
+  margin-top: 20px;
+}
+#preview {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 2px solid #ccc;
+  object-fit: cover;
+  background-color: black;
+}
+#scannerControls {
+  margin-top: 10px;
+}
+.manual-entry {
+  margin-top: 20px;
+}
+input[type="text"] {
+  width: 80%;
+  padding: 10px;
+  font-size: 1.1em;
+  margin: 5px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+#result {
+  margin-top: 20px;
+  font-size: 1.2em;
+}
+.valid {
+  color: green;
+  font-weight: bold;
+}
+.invalid {
+  color: red;
+  font-weight: bold;
+}
