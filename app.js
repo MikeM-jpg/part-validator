@@ -87,44 +87,52 @@ function startScanner() {
     scannerInitialized = false;
   }
 
-  setTimeout(() => {
-    Quagga.init({
-      inputStream: {
-        name: "Live",
-        type: "LiveStream",
-        target: document.querySelector('#preview'),
-        constraints: {
-          facingMode: "environment",
-          width: { min: 320 },
-          height: { min: 240 }
+  const constraints = {
+    audio: false,
+    video: {
+      facingMode: "environment",
+      width: { ideal: 640 },
+      height: { ideal: 480 }
+    }
+  };
+
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(function(stream) {
+      const video = document.getElementById('preview');
+      video.srcObject = stream;
+      video.setAttribute("playsinline", true);
+      video.play();
+
+      // start scanner
+      Quagga.init({
+        inputStream: {
+          name: "Live",
+          type: "LiveStream",
+          target: video
+        },
+        decoder: {
+          readers: ["code_128_reader", "code_39_reader"]
         }
-      },
-      locator: {
-        patchSize: "medium",
-        halfSample: true
-      },
-      numOfWorkers: navigator.hardwareConcurrency || 2,
-      decoder: {
-        readers: ["code_128_reader", "code_39_reader"]
-      },
-      locate: true
-    }, function (err) {
-      if (err) {
-        console.error('Quagga init error:', err);
-        alert("Failed to access camera. Please make sure it's allowed in your browser settings.");
-        return;
-      }
+      }, function(err) {
+        if (err) {
+          console.error("Quagga init error:", err);
+          return;
+        }
+        Quagga.start();
+        scannerInitialized = true;
+      });
 
-      Quagga.start();
-      scannerInitialized = true;
-    });
+      Quagga.onDetected(function(result) {
+        const code = result.codeResult.code;
+        if (code) {
+          currentDetectedCode = code.replace(/[\s-]/g, '').toUpperCase();
+          document.getElementById('live-code').textContent = currentDetectedCode;
+        }
+      });
 
-    Quagga.onDetected(function (result) {
-      const code = result.codeResult.code;
-      if (code) {
-        currentDetectedCode = code.replace(/[\s-]/g, '').toUpperCase();
-        document.getElementById('live-code').textContent = currentDetectedCode;
-      }
+    })
+    .catch(function(err) {
+      console.error("Camera permission denied:", err);
+      alert("Camera access is required to scan barcodes. Please enable it in Safari settings.");
     });
-  }, 500); // iOS delay for proper video load
 }
