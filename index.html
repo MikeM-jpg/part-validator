@@ -15,13 +15,14 @@
 
     <button id="startBtn" onclick="startScanner()">Start Scanning</button>
 
-    <div id="reader" class="reader">
+    <div id="reader" class="reader" style="display: none;">
       <video id="preview" autoplay playsinline muted></video>
-      <div class="scanner-controls">
-        <p>📷 Detected Code: <span id="live-code">Waiting...</span></p>
-                <button onclick="restartScanner()">Rescan</button>
+      <div class="scanner-controls" id="scannerControls">
+        <p id="detectedText">Detected Code: <span id="live-code">Waiting...</span></p>
       </div>
     </div>
+
+    <button id="rescanBtn" onclick="restartScanner()" style="display: none;">Rescan</button>
 
     <div class="manual-entry">
       <p>or manually enter a part number:</p>
