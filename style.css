@@ -23,9 +23,7 @@ button:hover {
 }
 .viewport video {
   width: 100%; height: auto; display: block;
-  object-fit: cover;
-  position: relative;
-  z-index: 1;
+  object-fit: cover; position: relative; z-index: 1;
 }
 .viewport canvas {
   position: absolute; top: 0; left: 0;
