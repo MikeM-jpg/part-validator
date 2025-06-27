@@ -90,6 +90,7 @@ function stopScanner() {
 function startScanner() {
   document.getElementById('startBtn').style.display = 'none';
   document.getElementById('reader').style.display = 'block';
+document.getElementById("preview").style.display = "block";
 document.getElementById("scannerControls").style.display = "block";
 document.getElementById("rescanBtn").style.display = "none";
 
