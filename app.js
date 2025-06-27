@@ -63,6 +63,10 @@ function checkPart(inputCode = null) {
       <p><strong>Contact:</strong> ${info.contact}</p>
     `;
     stopScanner();
+document.getElementById("reader").style.display = "none";
+document.getElementById("scannerControls").style.display = "none";
+document.getElementById("preview").style.display = "none";
+document.getElementById("rescanBtn").style.display = "block";
   } else {
     result.innerHTML = `<p class="invalid">❌ Invalid Part</p>`;
   }
@@ -90,8 +94,8 @@ function stopScanner() {
 function startScanner() {
   document.getElementById('startBtn').style.display = 'none';
   document.getElementById('reader').style.display = 'block';
-document.getElementById("preview").style.display = "block";
 document.getElementById("scannerControls").style.display = "block";
+document.getElementById("preview").style.display = "block";
 document.getElementById("rescanBtn").style.display = "none";
 
   if (scannerInitialized) {
