@@ -6,6 +6,7 @@ const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:j
 let partMap = {};
 let currentDetectedCode = '';
 let scannerInitialized = false;
+let scanningStopped = false;
 
 fetch(url)
   .then(res => res.text())
@@ -46,9 +47,10 @@ fetch(url)
     document.getElementById('last-updated').textContent = 'Error loading data';
   });
 
-function checkPart() {
-  const input = document.getElementById('manualInput').value.replace(/[\s-]/g, '').toUpperCase();
+function checkPart(inputCode = null) {
+  const input = inputCode || document.getElementById('manualInput').value.replace(/[\s-]/g, '').toUpperCase();
   const result = document.getElementById('result');
+  document.getElementById('manualInput').value = input;
 
   if (partMap[input]) {
     const info = partMap[input];
@@ -60,22 +62,29 @@ function checkPart() {
       <p><strong>Concern #:</strong> ${info.concern}</p>
       <p><strong>Contact:</strong> ${info.contact}</p>
     `;
+    stopScanner();
   } else {
     result.innerHTML = `<p class="invalid">❌ Invalid Part</p>`;
   }
 }
 
-function confirmScan() {
-  document.getElementById('manualInput').value = currentDetectedCode;
-  checkPart();
-  Quagga.stop();
-  scannerInitialized = false;
-}
-
 function restartScanner() {
   document.getElementById('result').innerHTML = '';
   document.getElementById('live-code').textContent = 'Waiting...';
+  scanningStopped = false;
   startScanner();
+}
+
+function stopScanner() {
+  scanningStopped = true;
+  Quagga.offDetected();
+  Quagga.stop();
+  const video = document.getElementById('preview');
+  if (video.srcObject) {
+    video.srcObject.getTracks().forEach(track => track.stop());
+    video.srcObject = null;
+  }
+  scannerInitialized = false;
 }
 
 function startScanner() {
@@ -103,7 +112,6 @@ function startScanner() {
       video.setAttribute("playsinline", true);
       video.play();
 
-      // start scanner
       Quagga.init({
         inputStream: {
           name: "Live",
@@ -123,13 +131,18 @@ function startScanner() {
       });
 
       Quagga.onDetected(function(result) {
+        if (scanningStopped) return;
+
         const code = result.codeResult.code;
         if (code) {
           currentDetectedCode = code.replace(/[\s-]/g, '').toUpperCase();
           document.getElementById('live-code').textContent = currentDetectedCode;
+
+          if (partMap[currentDetectedCode]) {
+            checkPart(currentDetectedCode);
+          }
         }
       });
-
     })
     .catch(function(err) {
       console.error("Camera permission denied:", err);
