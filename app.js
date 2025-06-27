@@ -1,3 +1,4 @@
+
 const sheetID = '1osWtIElVxSKtwTMQ__P_J4RX7Z-yuJuYTYbKkfd48co';
 const sheetName = 'Sheet1';
 const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
@@ -83,6 +84,9 @@ function startScanner() {
     scannerInitialized = false;
   }
 
+  document.getElementById('startBtn').style.display = 'none';
+  document.getElementById('reader').style.display = 'block';
+
   Quagga.init({
     inputStream: {
       name: "Live",
@@ -112,7 +116,3 @@ function startScanner() {
     }
   });
 }
-
-window.onload = () => {
-  startScanner();
-};
