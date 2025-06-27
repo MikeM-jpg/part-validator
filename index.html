@@ -9,23 +9,29 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
 </head>
 <body>
-  <h1>📦 Part Validator</h1>
-  <p>Last Updated: <span id="last-updated">Loading...</span></p>
+  <div class="container">
+    <h1>📦 Part Validator</h1>
+    <p class="updated">Last Updated: <span id="last-updated">Loading...</span></p>
 
-  <button id="startBtn" onclick="startScanner()">Start Scanning</button>
+    <button id="startBtn" onclick="startScanner()">Start Scanning</button>
 
-  <div id="reader" style="display: none; width: 100%; max-width: 400px; margin: auto;">
-    <video id="preview" autoplay playsinline muted style="width: 100%; border: 1px solid #ccc;"></video>
-    <p>Detected: <span id="live-code">Waiting...</span></p>
-    <button id="confirmBtn" onclick="confirmScan()">Scan</button>
-    <button onclick="restartScanner()">Rescan</button>
+    <div id="reader" class="reader">
+      <video id="preview" autoplay playsinline muted></video>
+      <div class="scanner-controls">
+        <p>📷 Detected Code: <span id="live-code">Waiting...</span></p>
+        <button id="confirmBtn" onclick="confirmScan()">Scan</button>
+        <button onclick="restartScanner()">Rescan</button>
+      </div>
+    </div>
+
+    <div class="manual-entry">
+      <p>or manually enter a part number:</p>
+      <input type="text" id="manualInput" placeholder="Enter part number" />
+      <button onclick="checkPart()">Check</button>
+    </div>
+
+    <div id="result"></div>
   </div>
-
-  <p>or manually enter a part number:</p>
-  <input type="text" id="manualInput" placeholder="Enter part number" />
-  <button onclick="checkPart()">Check</button>
-
-  <div id="result"></div>
 
   <script src="app.js"></script>
 </body>
