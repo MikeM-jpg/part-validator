@@ -38,14 +38,6 @@ button:hover {
   background-color: #1b5e20;
 }
 
-#rescanBtn {
-  display: block;
-  margin: 20px auto;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
 .reader {
   display: none;
   margin-top: 20px;
