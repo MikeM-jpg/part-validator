@@ -62,7 +62,7 @@ function checkPart(inputCode = null) {
       <p><strong>Concern #:</strong> ${info.concern}</p>
       <p><strong>Contact:</strong> ${info.contact}</p>
     `;
-    stopScanner();
+    stopScanner(); document.getElementById("reader").style.display = "none";
   } else {
     result.innerHTML = `<p class="invalid">❌ Invalid Part</p>`;
   }
