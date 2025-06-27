@@ -12,12 +12,8 @@
     <h1>📦 Part Validator</h1>
     <p class="updated">Last Updated: <span id="last-updated">Loading...</span></p>
     <button id="startBtn" onclick="startScanner()">Start Scanning</button>
-    <div id="reader" class="reader" style="display:none;">
-      <video id="preview" autoplay playsinline muted></video>
-      <div id="scannerControls">
-        <p id="detectedText">Detected Code: <span id="live-code">Waiting...</span></p>
-      </div>
-    </div>
+    <div id="interactive" class="viewport" style="display:none;"></div>
+    <div id="detected" style="display:none;"><p>Detected Code: <span id="live-code">Waiting...</span></p></div>
     <button id="rescanBtn" onclick="restartScanner()" style="display:none;">Rescan</button>
     <div class="manual-entry">
       <p>or manually enter a part number:</p>
