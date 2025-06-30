@@ -7,6 +7,15 @@ let partMap = {};
 let lastBox = null;
 let stopped = false;
 
+// Normalize code: remove hyphens/spaces, uppercase, strip leading 'P' if needed
+function normalizeCode(raw) {
+  let code = raw.replace(/[\s-]/g, '').toUpperCase();
+  if (code.startsWith('P') && partMap[code.slice(1)]) {
+    code = code.slice(1);
+  }
+  return code;
+}
+
 // Load part data
 fetch(url)
   .then(res => res.text())
@@ -19,11 +28,9 @@ fetch(url)
       const plant = row.c[3]?.v || '';
       const concern = row.c[4]?.v || '';
       const contact = row.c[12]?.v || '';
-      const parts = (row.c[6]?.v || '').split(/\n|,/).map(p =>
-        p.replace(/[\s-]/g, '').toUpperCase()
-      );
+      const parts = (row.c[6]?.v || '').split(/\n|,/).map(p => normalizeCode(p));
       parts.forEach(p => {
-        partMap[p] = { loc, sup, plant, concern, contact };
+        if (p) partMap[p] = { loc, sup, plant, concern, contact };
       });
     });
     document.getElementById('last-updated').textContent = new Date().toLocaleString();
@@ -33,9 +40,10 @@ fetch(url)
     document.getElementById('last-updated').textContent = 'Error loading data';
   });
 
-// Check part manually or programmatically
+// Validate and show result
 function checkPart(code = null) {
-  const val = code || document.getElementById('manualInput').value.replace(/[\s-]/g, '').toUpperCase();
+  const raw = code || document.getElementById('manualInput').value;
+  const val = normalizeCode(raw);
   document.getElementById('manualInput').value = val;
   const resultDiv = document.getElementById('result');
   if (partMap[val]) {
@@ -66,7 +74,6 @@ function showResult(code) {
   document.getElementById('detected').style.display = 'none';
   document.getElementById('rescanBtn').style.display = 'block';
 
-  // fill input
   document.getElementById('manualInput').value = code;
 }
 
@@ -76,6 +83,7 @@ function restartScanner() {
   document.getElementById('live-code').textContent = 'Waiting...';
   document.getElementById('rescanBtn').style.display = 'none';
   stopped = false;
+  lastBox = null;
   startScanner();
 }
 
@@ -101,7 +109,7 @@ function startScanner() {
   }, err => {
     if (err) {
       console.error('Quagga init error:', err);
-      alert('Camera init error');
+      alert('Camera initialization error');
       return;
     }
     Quagga.start();
@@ -129,7 +137,8 @@ function startScanner() {
 
   Quagga.onDetected(result => {
     if (stopped) return;
-    const code = result.codeResult.code.replace(/[\s-]/g, '').toUpperCase();
+    const rawCode = result.codeResult.code;
+    const code = normalizeCode(rawCode);
     document.getElementById('live-code').textContent = code;
     if (partMap[code]) {
       showResult(code);
@@ -137,7 +146,7 @@ function startScanner() {
   });
 }
 
-// Expose functions
+// Expose functions to global scope
 window.startScanner = startScanner;
 window.restartScanner = restartScanner;
 window.checkPart = checkPart;
