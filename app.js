@@ -4,7 +4,6 @@ const sheetName = 'Sheet1';
 const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
 
 let partMap = {};
-let lastBox = null;
 let stopped = false;
 
 let lastCode = null;
@@ -39,8 +38,7 @@ fetch(url).then(res => res.text()).then(data => {
 // Show details instantly
 function showResult(code) {
   stopped = true;
-  Quagga.stop(); Quagga.offProcessed(); Quagga.offDetected();
-  lastBox = null;
+  Quagga.stop(); Quagga.offDetected();
   document.getElementById('interactive').style.display = 'none';
   document.getElementById('detected').style.display = 'none';
   document.getElementById('rescanBtn').style.display = 'block';
@@ -59,16 +57,26 @@ function restartScanner() {
   document.getElementById('result').innerHTML = '';
   document.getElementById('live-code').textContent = 'Waiting...';
   document.getElementById('rescanBtn').style.display = 'none';
-  stopped = false; lastBox = null; lastCode = null; stableCount = 0; lastReadTime = 0;
+  stopped = false; lastCode = null; stableCount = 0; lastReadTime = 0;
   startScanner();
 }
 
-// Start scanning
+// Validate and show result
+function checkPart(code = null) {
+  const raw = code || document.getElementById('manualInput').value;
+  const val = normalizeCode(raw);
+  document.getElementById('manualInput').value = val;
+  if (partMap[val]) showResult(val);
+  else document.getElementById('result').innerHTML = '<p class="invalid">❌ Invalid Part</p>';
+}
+
+// Initialize scanning
 function startScanner() {
   document.getElementById('startBtn').style.display = 'none';
   document.getElementById('interactive').style.display = 'block';
   document.getElementById('detected').style.display = 'block';
-  stopped = false; lastBox = null; lastCode = null; stableCount = 0;
+  stopped = false; lastCode = null; stableCount = 0; lastReadTime = 0;
+  document.getElementById('rescanBtn').style.display = 'none';
 
   Quagga.init({
     inputStream: {
@@ -84,17 +92,7 @@ function startScanner() {
     Quagga.start();
   });
 
-  Quagga.onProcessed(result => {
-    const ctx = Quagga.canvas.ctx.overlay, canvas = Quagga.canvas.dom.overlay;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (result && result.box) lastBox = result.box;
-    if (lastBox) {
-      ctx.beginPath(); ctx.moveTo(lastBox[0][0], lastBox[0][1]);
-      for (let i = 1; i < lastBox.length; i++) ctx.lineTo(lastBox[i][0], lastBox[i][1]);
-      ctx.closePath(); ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,255,0,0.4)'; ctx.stroke();
-    }
-  });
-
+  // Only detect, no overlay drawing
   Quagga.onDetected(result => {
     if (stopped) return;
     const now = Date.now();
@@ -104,8 +102,11 @@ function startScanner() {
     if (stableCount < STABLE_THRESHOLD) return;
     lastReadTime = now;
     if (partMap[codeNorm]) showResult(codeNorm);
+    document.getElementById('live-code').textContent = codeNorm;
   });
 }
 
+// Expose functions globally
 window.startScanner = startScanner;
 window.restartScanner = restartScanner;
+window.checkPart = checkPart;
