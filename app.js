@@ -7,6 +7,12 @@ let partMap = {};
 let lastBox = null;
 let stopped = false;
 
+let lastCode = null;
+let stableCount = 0;
+const STABLE_THRESHOLD = 4;
+const DEBOUNCE_MS = 500;
+let lastReadTime = 0;
+
 // Normalize code: remove hyphens/spaces, uppercase, strip leading 'P' if needed
 function normalizeCode(raw) {
   let code = raw.replace(/[\s-]/g, '').toUpperCase();
@@ -37,7 +43,7 @@ fetch(url)
   })
   .catch(err => {
     console.error('Error loading sheet data', err);
-    document.getElementById('last-updated').textContent = 'Error loading data';
+    document.getElementById('last-updated').textContent = 'Error';
   });
 
 // Validate and show result
@@ -73,8 +79,6 @@ function showResult(code) {
   document.getElementById('interactive').style.display = 'none';
   document.getElementById('detected').style.display = 'none';
   document.getElementById('rescanBtn').style.display = 'block';
-
-  document.getElementById('manualInput').value = code;
 }
 
 // Restart scanning
@@ -84,6 +88,9 @@ function restartScanner() {
   document.getElementById('rescanBtn').style.display = 'none';
   stopped = false;
   lastBox = null;
+  lastCode = null;
+  stableCount = 0;
+  lastReadTime = 0;
   startScanner();
 }
 
@@ -101,9 +108,15 @@ function startScanner() {
       name: 'Live',
       type: 'LiveStream',
       target: document.querySelector('#interactive'),
-      constraints: { facingMode: 'environment' }
+      constraints: { facingMode: 'environment' },
+      area: { // restrict scanning to center region
+        top: "25%",
+        right: "25%",
+        left: "25%",
+        bottom: "25%"
+      }
     },
-    locator: { patchSize: 'medium', halfSample: true },
+    locator: { patchSize: 'large', halfSample: false },
     decoder: { readers: ['code_128_reader', 'code_39_reader'] },
     locate: true
   }, err => {
@@ -137,16 +150,30 @@ function startScanner() {
 
   Quagga.onDetected(result => {
     if (stopped) return;
+    const now = Date.now();
     const rawCode = result.codeResult.code;
     const code = normalizeCode(rawCode);
-    document.getElementById('live-code').textContent = code;
+
+    // Debounce
+    if (now - lastReadTime < DEBOUNCE_MS) return;
+
+    // Stable read
+    if (code === lastCode) {
+      stableCount++;
+    } else {
+      lastCode = code;
+      stableCount = 1;
+    }
+    if (stableCount < STABLE_THRESHOLD) return;
+
+    lastReadTime = now;
     if (partMap[code]) {
-      showResult(code);
+      checkPart(code);
     }
   });
 }
 
-// Expose functions to global scope
+// Expose functions globally
 window.startScanner = startScanner;
 window.restartScanner = restartScanner;
 window.checkPart = checkPart;
